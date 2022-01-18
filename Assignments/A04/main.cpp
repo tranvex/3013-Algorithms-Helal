@@ -71,7 +71,18 @@ struct Node {
         next = NULL;
     }
     
-    
+    /**
+     * Public : Node
+     * 
+     * Description:
+     *      Node constructor
+     * 
+     * Params:
+     *      int n
+     * 
+     * Returns:
+     *      A constructed node with passed in integer
+     */
     Node(int n) {
         x = n;
         next = NULL;
@@ -80,37 +91,33 @@ struct Node {
 
 
 /**
- * Huffman
+ * List
  * 
  * Description:
- *      This class implements a compressions algorithm called Huffman Coding.
- *      Huffman coding assigns codes to characters such that the length of the 
- *      code depends on the relative frequency or weight of the corresponding 
- *      character. Huffman codes are of variable-length, and prefix-free
+ *      This class implements a linked list with a head and tail pointer
+ *      and a size variable to keep track of the list size. The list has
+ *      push, pop, insert, print, print tail capabilities. It also
+ *      overloads the +, [] operators and ostream (cout).
  * 
  * Public Methods:
- *                          Huffman()                               
- *      void                BuildFrequencyTable(string filename)
- *      string              LookupCode(char key)
- *      void                Analyze()
- *      map<char, string>   GetCodes()
+ *                          List()                               
+ *      void                push(int val)
+ *      void                insert(int val)
+ *      void                PrintTail()
+ *      string              Print()
+ *      int                 Pop()
  * 
  * Private Methods:
- *      void                _BuildLookupTable
- *      void                _BuildTree
- *      int                 _maxDepth
+ *      N/A
  * 
  * Usage: 
  * 
- *      Huffman H(filename):                        // Create Instance of Huffman
- *                                                  // and build freq table. 
- *      H.GetCodes();                               // get map <char,string> of codes
- * 
- *                                                  // or
- *      
- *      Huffman H;                                  // do seperately
- *      H.BuildFrequencyTable(filename);            // or use to re-build another file
- *      H.LookupCode('s')                           // get code for 's' 
+ *      List H;                                     // Create Instance of List 
+ *      H.push(5);                                  // push 5 to list
+ *      H.insert(6);                                // Insert 6 in order to list
+ *      H.PrintTail();                              // Prints value of tail in list
+ *      H.Print();                                  // Returns values of list as string, ready for printing
+ *      H.Pop();                                    // Returns popped value from list
  *      
  */
 class List {
@@ -120,11 +127,35 @@ private:
     int Size;
 
 public:
+    /**
+     * Public : List
+     * 
+     * Description:
+     *      Constructs List class object
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      Constructed List Class object
+     */
     List() {
         Head = Tail = NULL;
         Size = 0;
     }
 
+    /**
+     * Public : Push
+     * 
+     * Description:
+     *      Pushes integer value to linked list
+     * 
+     * Params:
+     *      [int]     :  Value pushed
+     * 
+     * Returns:
+     *      [type] Void
+     */
     void Push(int val) {
         // allocate new memory and init node
         Node *Temp = new Node(val);
@@ -138,6 +169,18 @@ public:
         Size++;
     }
 
+    /**
+     * Public : Insert
+     * 
+     * Description:
+     *      Inserts integer value in order to linked list
+     * 
+     * Params:
+     *      [int]     :  Value inserted
+     * 
+     * Returns:
+     *      [type] Void
+     */
     void Insert(int val) {
         // allocate new memory and init node
         Node *Temp = new Node(val);
@@ -152,10 +195,34 @@ public:
         Size++;
     }
 
+    /**
+     * Public : PrintTail
+     * 
+     * Description:
+     *      Prints value in the tail of the list
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      [type] Void
+     */
     void PrintTail() {
         cout << Tail->x << endl;
     }
 
+    /**
+     * Public : Print
+     * 
+     * Description:
+     *      Returns string of values in list ready to be printed
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      [String]     :  Values ready to be printed in this string
+     */
     string Print() {
         Node *Temp = Head;
         string list;
@@ -168,12 +235,37 @@ public:
         return list;
     }
 
+    /**
+     * Public : Pop
+     * 
+     * Description:
+     *      Pops integer value from linked list
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      [int]     :  Value popped from list
+     */
     // not implemented
     int Pop() {
         Size--;
         return 0; //
     }
 
+    /**
+     * Public : Operator Overloading +
+     * 
+     * Description:
+     *      Overloads the addition operator to seamlessly add two lists by
+     *      creating new list with values added.
+     * 
+     * Params:
+     *      [type]  RHS List   :  Right Hand Side list
+     * 
+     * Returns:
+     *      [type]  List     :  Newly created list with added values
+     */
     List operator+(const List &Rhs) {
         // Create a new list that will contain both when done
         List NewList;
@@ -200,6 +292,18 @@ public:
         return NewList;
     }
 
+    /**
+     * Public : Operator Overloading []
+     * 
+     * Description:
+     *      Overloads [] to give list array-like random-access capabilities.
+     * 
+     * Params:
+     *      [int]  Index number   :  Number of index needing to be accessed
+     * 
+     * Returns:
+     *      [int]      : Value at index requested
+     */
     // Implementation of [] operator.  This function returns an
     // int value as if the list were an array.
     int operator[](int index) {
@@ -217,6 +321,20 @@ public:
         }
     }
 
+    /**
+     * Public : Operator Overloading ostream (cout)
+     * 
+     * Description:
+     *      Allows user to cout a list directly since ostream is
+     *      overloaded
+     * 
+     * Params:
+     *      [type]  ostream os   :  ostream object for printing
+     *      [type]  List   :  List going to be printed
+     * 
+     * Returns:
+     *      [type]  ostream os     :  ostream object with values printed
+     */
     friend ostream &operator<<(ostream &os, List L) {
         os << L.Print();
         return os;
