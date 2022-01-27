@@ -1,0 +1,17 @@
+######################################################################
+Assignment 4 - Resizing the Stack
+CMPS 3013
+Yoseph Helal
+
+Config Params:
+Full Threshold: 0.85
+Shrink Threshold: 0.15
+Grow Ratio: 2
+Shrink Ratio: 0.5
+
+Processed 100001 Commands
+
+Max Stack Size: 40960
+End Stack Size: 10
+Stack Resized: 24
+######################################################################
