@@ -2,7 +2,7 @@
 *                    
 *  Author:           Yoseph Helal
 *  Email:            tranvex@gmail.com
-*  Label:            A04
+*  Label:            A03B
 *  Title:            Linked List Class
 *  Course:           CMPS 3013
 *  Semester:         Spring 2022
