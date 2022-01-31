@@ -1,343 +1,365 @@
-///////////////////////////////////////////////////////////////////////////////
-//
-// Author:           Yoseph Helal
-// Email:            tranvex@gmail.com
-// Label:            P01
-// Title:            Program 01 - Array Based Stack
-// Course:           3013
-// Semester:         Spring 2022
-//
-// Description:
-//       Overview of a class implementing an array based stack
-//
-//
-/////////////////////////////////////////////////////////////////////////////////
+/*****************************************************************************
+*                    
+*  Author:           Yoseph Helal
+*  Email:            tranvex@gmail.com
+*  Label:            A04
+*  Title:            Linked List Class
+*  Course:           CMPS 3013
+*  Semester:         Spring 2022
+* 
+*  Description:
+*        This program implements a class that allows a linked list to be used just like 
+*        an array. It overloads the "[]" (square brackets) to simulate accessing seperate 
+*        array elements, but really it traverses the list to find the specified node using
+*        an index value. It also overloads the "+" and "-" signs allowing a user to "add"
+*        or "push" items onto the end of the list, as well as "pop" items off the end of our 
+*        array. This class is not meant to replace the STL vector library, its simply a project
+*        to introduce the beginnings of creating complex / abstract data types. 
+*        
+*  Usage: 
+*       - $ ./main filename
+*       - This will read in a file containing whatever values to be read into our list/array. 
+*       
+*  Files:            
+*       main.cpp    : driver program 
+*****************************************************************************/
+
 #include <iostream>
-#include <fstream>
 
 using namespace std;
 
+int A[100];
+
 /**
- * ArrayStack
+ * Node
  * 
  * Description:
- *      Array based stack
+ *      Struct simply representing a node for our linked list. Each node
+ *      holds a next pointer and an integer value.
  * 
  * Public Methods:
- *      - See class below
+ *                          Node()                               
+ *                          Node(int)
+ * 
+ * Private Methods:
+ *      N/A
  * 
  * Usage: 
- *      - See main program
+ * 
+ *      Node H(int):                        // Create Instance of Node
+ *      Node Y():                           // Create instance of Node
  *      
  */
-class ArrayStack {
-private:
-    int *A;   // pointer to array of int's
-    int top;  // top of stack
-    //double threshHold = .85;
-
-    // top = number of items in the stack + 1
-    // size = array size
-
-    // size = 100
-    // (top + 1) / size
-
-public:
-  // Default Values
-  double growThresh = 0.85;
-  double shrinkThresh = 0.15;
-  double growMul = 2.0;
-  double shrinkMul = 0.5;
-  int commands = 0;
-  int resizes = 0;
-  int maxSize = 0;
-  int size; // current max stack size
-  
+struct Node {
+    int x;
+    Node *next;
+    
     /**
-  * ArrayStack
-  * 
-  * Description:
-  *      Constructor no params
-  * 
-  * Params:
-  *     - None
-  * 
-  * Returns:
-  *     - NULL
-  */
-    ArrayStack() {
-        size = 10;
-        A = new int[size];
-        top = -1;
+     * Public : Node
+     * 
+     * Description:
+     *      Node constructor
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      A constructed node
+     */
+    Node() {
+        x = -1;
+        next = NULL;
     }
-
+    
     /**
-  * ArrayStack
-  * 
-  * Description:
-  *      Constructor size param
-  * 
-  * Params:
-  *     - int size
-  * 
-  * Returns:
-  *     - NULL
-  */
-    ArrayStack(int s) {
-        size = s;
-        A = new int[s];
-        top = -1;
-    }
-
-    /**
-  * Public bool: Empty
-  * 
-  * Description:
-  *      Stack empty?
-  * 
-  * Params:
-  *      NULL
-  * 
-  * Returns:
-  *      [bool] true = empty
-  */
-    bool Empty() {
-        return (top <= -1);
-    }
-
-    /**
-  * Public bool: Full
-  * 
-  * Description:
-  *      Stack full?
-  * 
-  * Params:
-  *      NULL
-  * 
-  * Returns:
-  *      [bool] true = full
-  */
-    bool Full() {
-        return (top >= size - 1);
-    }
-
-    /**
-  * Public int: Peek
-  * 
-  * Description:
-  *      Returns top value without altering the stack
-  * 
-  * Params:
-  *      NULL
-  * 
-  * Returns:
-  *      [int] top value if any
-  */
-    int Peek() {
-        if (!Empty()) {
-            return A[top];
-        }
-
-        return -99; // some sentinel value
-                    // not a good solution
-    }
-
-    /**
-  * Public int: Pop
-  * 
-  * Description:
-  *      Returns top value and removes it from stack
-  * 
-  * Params:
-  *      NULL
-  * 
-  * Returns:
-  *      [int] top value if any
-  */
-    int Pop() {
-        if (!Empty()) {
-            return A[top--];
-            checkResize();
-        }
-
-        return -99; // some sentinel value
-                    // not a good solution
-    }
-
-    /**
-  * Public void: Print
-  * 
-  * Description:
-  *      Prints stack to standard out
-  * 
-  * Params:
-  *      NULL
-  * 
-  * Returns:
-  *      NULL
-  */
-    void Print() {
-        for (int i = 0; i <= top; i++) {
-            cout << A[i] << " ";
-        }
-        cout << endl;
-    }
-
-    /**
-  * Public bool: Push
-  * 
-  * Description:
-  *      Adds an item to top of stack
-  * 
-  * Params:
-  *      [int] : item to be added
-  * 
-  * Returns:
-  *      [bool] ; success = true
-  */
-    bool Push(int x) {
-        if (Full()) {
-            ContainerGrow();
-        }
-        if (!Full()) {
-            A[++top] = x;
-
-            checkResize();
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-  * Public void: Resize
-  * 
-  * Description:
-  *      Resizes the container for the stack by doubling
-  *      its capacity
-  * 
-  * Params:
-  *      NULL
-  * 
-  * Returns:
-  *      NULL
-  */
-    void ContainerGrow() {
-        int newSize = size * growMul;    // double size of original
-        maxSize = newSize; // Set new max size because container grows
-        int *B = new int[newSize]; // allocate new memory
-
-        for (int i = 0; i < top; i++) { // copy values to new array
-            B[i] = A[i];
-        }
-
-        delete[] A; // delete old array
-
-        size = newSize; // save new size
-
-        A = B; // reset array pointer
-    }
-
-    void ContainerShrink() {
-        int newSize = size * shrinkMul;    // halve size of original
-        if (newSize >= 10) {
-          int *B = new int[newSize]; // allocate new memory
-
-          for (int i = 0; i < top; i++) { // copy values to new array
-            B[i] = A[i];
-          }
-
-          delete[] A; // delete old array
-
-          size = newSize; // save new size
-
-          A = B; // reset array pointer
-        }
-
-    }
-
-    void checkResize() {
-        double check = double(top) / size;
-        if (check >= growThresh) {
-          ContainerGrow();
-          resizes++;
-        }
-        if (size > 10 && check <= shrinkThresh) {
-          ContainerShrink();
-          resizes++;
-        }
+     * Public : Node
+     * 
+     * Description:
+     *      Node constructor
+     * 
+     * Params:
+     *      int n
+     * 
+     * Returns:
+     *      A constructed node with passed in integer
+     */
+    Node(int n) {
+        x = n;
+        next = NULL;
     }
 };
 
-// MAIN DRIVER
-// Simple Array Based Stack Usage:
-int main(int argc, char *argv[]) {
-    ArrayStack stack;              // stack instance
-    ifstream fin;        
-    string file = "nums_test.dat"; // Default file name
-    int num = 0;                    // value to read in from file
 
-    if (argc == 2){
-      file = argv[1];
-    }
-    else if (argc == 5) {
-      stack.growThresh = atof(argv[1]);
-      stack.shrinkThresh = atof(argv[2]);
-      stack.growMul = atof(argv[3]);
-      stack.shrinkMul = atof(argv[4]);
-    }
-    else if (argc == 6) {
-      file = argv[1];
-      stack.growThresh = atof(argv[2]);
-      stack.shrinkThresh = atof(argv[3]);
-      stack.growMul = atof(argv[4]);
-      stack.shrinkMul = atof(argv[5]);
-      
-    }
-    
-    /*int r = 0;
+/**
+ * List
+ * 
+ * Description:
+ *      This class implements a linked list with a head and tail pointer
+ *      and a size variable to keep track of the list size. The list has
+ *      push, pop, insert, print, print tail capabilities. It also
+ *      overloads the +, [] operators and ostream (cout).
+ * 
+ * Public Methods:
+ *                          List()                               
+ *      void                push(int val)
+ *      void                insert(int val)
+ *      void                PrintTail()
+ *      string              Print()
+ *      int                 Pop()
+ * 
+ * Private Methods:
+ *      N/A
+ * 
+ * Usage: 
+ * 
+ *      List H;                                     // Create Instance of List 
+ *      H.push(5);                                  // push 5 to list
+ *      H.insert(6);                                // Insert 6 in order to list
+ *      H.PrintTail();                              // Prints value of tail in list
+ *      H.Print();                                  // Returns values of list as string, ready for printing
+ *      H.Pop();                                    // Returns popped value from list
+ *      
+ */
+class List {
+private:
+    Node *Head;
+    Node *Tail;
+    int Size;
 
-    for (int i = 0; i < 20; i++) {
-        r = rand() % 100;
-        r = i + 1;
-        if (!stack.Push(r)) {
-            cout << "Push failed" << endl;
+public:
+    /**
+     * Public : List
+     * 
+     * Description:
+     *      Constructs List class object
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      Constructed List Class object
+     */
+    List() {
+        Head = Tail = NULL;
+        Size = 0;
+    }
+
+    /**
+     * Public : Push
+     * 
+     * Description:
+     *      Pushes integer value to linked list
+     * 
+     * Params:
+     *      [int]     :  Value pushed
+     * 
+     * Returns:
+     *      [type] Void
+     */
+    void Push(int val) {
+        // allocate new memory and init node
+        Node *Temp = new Node(val);
+
+        if (!Head && !Tail) {
+            Head = Tail = Temp;
+        } else {
+            Tail->next = Temp;
+            Tail = Temp;
+        }
+        Size++;
+    }
+
+    /**
+     * Public : Insert
+     * 
+     * Description:
+     *      Inserts integer value in order to linked list
+     * 
+     * Params:
+     *      [int]     :  Value inserted
+     * 
+     * Returns:
+     *      [type] Void
+     */
+    void Insert(int val) {
+        // allocate new memory and init node
+        Node *Temp = new Node(val);
+
+        // figure out where it goes in the list
+
+        Temp->next = Head;
+        Head = Temp;
+        if (!Tail) {
+            Tail = Head;
+        }
+        Size++;
+    }
+
+    /**
+     * Public : PrintTail
+     * 
+     * Description:
+     *      Prints value in the tail of the list
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      [type] Void
+     */
+    void PrintTail() {
+        cout << Tail->x << endl;
+    }
+
+    /**
+     * Public : Print
+     * 
+     * Description:
+     *      Returns string of values in list ready to be printed
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      [String]     :  Values ready to be printed in this string
+     */
+    string Print() {
+        Node *Temp = Head;
+        string list;
+
+        while (Temp != NULL) {
+            list += to_string(Temp->x) + "->";
+            Temp = Temp->next;
+        }
+
+        return list;
+    }
+
+    /**
+     * Public : Pop
+     * 
+     * Description:
+     *      Pops integer value from linked list
+     * 
+     * Params:
+     *      N/A
+     * 
+     * Returns:
+     *      [int]     :  Value popped from list
+     */
+    // not implemented
+    int Pop() {
+        Size--;
+        return 0; //
+    }
+
+    /**
+     * Public : Operator Overloading +
+     * 
+     * Description:
+     *      Overloads the addition operator to seamlessly add two lists by
+     *      creating new list with values added.
+     * 
+     * Params:
+     *      [type]  RHS List   :  Right Hand Side list
+     * 
+     * Returns:
+     *      [type]  List     :  Newly created list with added values
+     */
+    List operator+(const List &Rhs) {
+        // Create a new list that will contain both when done
+        List NewList;
+
+        // Get a reference to beginning of local list
+        Node *Temp = Head;
+
+        // Loop through local list and Push values onto new list
+        while (Temp != NULL) {
+            NewList.Push(Temp->x);
+            Temp = Temp->next;
+        }
+
+        // Get a reference to head of Rhs
+        Temp = Rhs.Head;
+
+        // Same as above, loop and push
+        while (Temp != NULL) {
+            NewList.Push(Temp->x);
+            Temp = Temp->next;
+        }
+
+        // Return new concatenated version of lists
+        return NewList;
+    }
+
+    /**
+     * Public : Operator Overloading []
+     * 
+     * Description:
+     *      Overloads [] to give list array-like random-access capabilities.
+     * 
+     * Params:
+     *      [int]  Index number   :  Number of index needing to be accessed
+     * 
+     * Returns:
+     *      [int]      : Value at index requested
+     */
+    // Implementation of [] operator.  This function returns an
+    // int value as if the list were an array.
+    int operator[](int index) {
+        Node *Temp = Head;
+
+        if (index >= Size) {
+            cout << "Index out of bounds, exiting";
+            exit(0);
+        } else {
+
+            for (int i = 0; i < index; i++) {
+                Temp = Temp->next;
+            }
+            return Temp->x;
         }
     }
 
-    for (int i = 0; i < 7; i++) {
-        stack.Pop();
-    }*/
-    
-    
-    fin.open(file);
-    
-    while (!fin.eof()) {
-      stack.commands++;
-      fin >> num;
-      if (num %2 == 0) {
-        stack.Push(num);
-      }
-      if (num %2 == 1) {
-        stack.Pop();
-      }
+    /**
+     * Public : Operator Overloading ostream (cout)
+     * 
+     * Description:
+     *      Allows user to cout a list directly since ostream is
+     *      overloaded
+     * 
+     * Params:
+     *      [type]  ostream os   :  ostream object for printing
+     *      [type]  List   :  List going to be printed
+     * 
+     * Returns:
+     *      [type]  ostream os     :  ostream object with values printed
+     */
+    friend ostream &operator<<(ostream &os, List L) {
+        os << L.Print();
+        return os;
     }
-    
-    cout << "######################################################################" << endl;
-    cout << "Assignment 4 - Resizing the Stack" << endl;
-    cout << "CMPS 3013" << endl;
-    cout << "Yoseph Helal" << endl << endl;
-    cout << "Config Params:" << endl;
-    cout << "Full Threshold: " << stack.growThresh << endl;
-    cout << "Shrink Threshold: " << stack.shrinkThresh << endl;
-    cout << "Grow Ratio: " << stack.growMul << endl;
-    cout << "Shrink Ratio: " << stack.shrinkMul << endl << endl;
-    cout << "Processed " << stack.commands << " Commands" << endl << endl;
-    cout << "Max Stack Size: " << stack.maxSize << endl;
-    cout << "End Stack Size: " << stack.size << endl;
-    cout << "Stack Resized: " << stack.resizes << endl;
-    cout << "######################################################################" << endl;
+};
 
-    //stack.Print();
+int main(int argc, char **argv) {
+    List L1;
+    List L2;
+
+    for (int i = 0; i < 25; i++) {
+        L1.Push(i);
+    }
+
+    for (int i = 50; i < 100; i++) {
+        L2.Push(i);
+    }
+
+    //cout << L1 << endl;
+    L1.PrintTail();
+    L2.PrintTail();
+
+    List L3 = L1 + L2;
+    cout << L3 << endl;
+
+    cout << L3[5] << endl;
     return 0;
 }
