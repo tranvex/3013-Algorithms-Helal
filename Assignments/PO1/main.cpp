@@ -272,20 +272,27 @@ public:
 // MAIN DRIVER
 // Simple Array Based Stack Usage:
 int main(int argc, char *argv[]) {
-    ArrayStack stack;
+    ArrayStack stack;              // stack instance
+    ifstream fin;        
     string file = "nums_test.dat"; // Default file name
-    if (argc == 5) {
+    int num = 0;                    // value to read in from file
+
+    if (argc == 2){
+      file = argv[1];
+    }
+    else if (argc == 5) {
       stack.growThresh = atof(argv[1]);
       stack.shrinkThresh = atof(argv[2]);
       stack.growMul = atof(argv[3]);
       stack.shrinkMul = atof(argv[4]);
     }
-    if (argc == 6) {
-      stack.growThresh = atof(argv[1]);
-      stack.shrinkThresh = atof(argv[2]);
-      stack.growMul = atof(argv[3]);
-      stack.shrinkMul = atof(argv[4]);
-      file = argv[5];
+    else if (argc == 6) {
+      file = argv[1];
+      stack.growThresh = atof(argv[2]);
+      stack.shrinkThresh = atof(argv[3]);
+      stack.growMul = atof(argv[4]);
+      stack.shrinkMul = atof(argv[5]);
+      
     }
     
     /*int r = 0;
@@ -302,9 +309,9 @@ int main(int argc, char *argv[]) {
         stack.Pop();
     }*/
     
-    ifstream fin;
+    
     fin.open(file);
-    int num = 0;
+    
     while (!fin.eof()) {
       stack.commands++;
       fin >> num;
