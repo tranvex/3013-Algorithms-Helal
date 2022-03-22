@@ -155,8 +155,10 @@ vector<string> Trie::find_all(string key){
     
     for (int i = 0; i < key.length(); i++) {
         // go to the next node
-        curr = curr->character[key[i] - 65];
-
+      curr = curr->character[key[i] - 65];
+      if (curr==nullptr) {
+        return results;
+      }
     }
 
     find_all(curr,key);
